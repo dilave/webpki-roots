@@ -81,12 +81,21 @@ async fn new_generated_code_is_fresh() {
     let mut code = String::with_capacity(256 * 1_024);
     code.push_str(HEADER);
     code.push_str("pub const TLS_SERVER_ROOTS: &[TrustAnchor] = &[\n");
+    let mut code_pem = String::with_capacity(256 * 1_024);
+    code_pem.push_str("pub fn pems() ->Vec<&'static str>{\n    return vec![\n");
+
     let (mut subject, mut spki, mut name_constraints) =
         (String::new(), String::new(), String::new());
-
+    
     for (_, root) in tls_roots_map {
         // Verify the DER FP matches the metadata FP.
         let der = root.der();
+        let pem = root.pem();
+       
+        code_pem.push_str("\"");
+        code_pem.push_str(pem);
+        code_pem.push_str("\",\n");
+
         let calculated_fp = digest::digest(&digest::SHA256, &der);
         let metadata_fp = hex::decode(&root.sha256_fingerprint).expect("malformed fingerprint");
         assert_eq!(calculated_fp.as_ref(), metadata_fp.as_slice());
@@ -153,6 +162,7 @@ async fn new_generated_code_is_fresh() {
         code.push_str("  },\n\n");
     }
     code.push_str("];\n");
+    code_pem.push_str("];\n}\n");
 
     // Check that the generated code matches the checked-in code
     let old = fs::read_to_string("src/lib.rs").unwrap();
@@ -160,6 +170,12 @@ async fn new_generated_code_is_fresh() {
         fs::write("src/lib.rs", code).unwrap();
         panic!("generated code changed");
     }
+
+   // let old_pem = fs::read_to_string("src/pems.rs").unwrap();
+    //if old_pem != code_pem {
+        fs::write("src/pems.rs", code_pem).unwrap();
+    //    panic!("generated code pems changed");
+    //}
 }
 
 /// The built-in x509_parser::X509Name Display impl uses a different sort order than
