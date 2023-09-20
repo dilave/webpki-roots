@@ -1,3 +1,11 @@
+//!
+//! This library is automatically generated from the Mozilla
+//! IncludedCACertificateReportPEMCSV report via ccadb.org. Don't edit it.
+//!
+//! The generation is done deterministically so you can verify it
+//! yourself by inspecting and re-running the generation process.
+//!
+
 pub fn pems() ->Vec<&'static str>{
     return vec![
 "-----BEGIN CERTIFICATE-----

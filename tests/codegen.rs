@@ -81,7 +81,9 @@ async fn new_generated_code_is_fresh() {
     let mut code = String::with_capacity(256 * 1_024);
     code.push_str(HEADER);
     code.push_str("pub const TLS_SERVER_ROOTS: &[TrustAnchor] = &[\n");
+
     let mut code_pem = String::with_capacity(256 * 1_024);
+    code_pem.push_str(HEADER_PEMS);
     code_pem.push_str("pub fn pems() ->Vec<&'static str>{\n    return vec![\n");
 
     let (mut subject, mut spki, mut name_constraints) =
@@ -413,5 +415,16 @@ const HEADER: &str = r#"//!
 )]
 
 use pki_types::{Der, TrustAnchor};
+
+"#;
+
+
+const HEADER_PEMS: &str = r#"//!
+//! This library is automatically generated from the Mozilla
+//! IncludedCACertificateReportPEMCSV report via ccadb.org. Don't edit it.
+//!
+//! The generation is done deterministically so you can verify it
+//! yourself by inspecting and re-running the generation process.
+//!
 
 "#;
